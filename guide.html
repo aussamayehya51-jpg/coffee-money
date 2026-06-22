@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#5a3a22" />
+<title>Coffee Money — How to use it</title>
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  :root{ --brown:#5a3a22; --cream:#f7f1e8; --gold:#c8923a; --green:#1f9d57; --red:#d23b3b; --ink:#2c2419; --muted:#7a6a55; --line:#e4d9c8; }
+  body{ font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif; background:var(--cream); color:var(--ink); line-height:1.6; }
+  .wrap{ max-width:600px; margin:0 auto; padding:16px; }
+  .top{ background:var(--brown); color:#fff; border-radius:16px; padding:20px; text-align:center; margin-bottom:16px; }
+  .top h1{ font-size:24px; } .top .s{ opacity:.9; font-size:14px; margin-top:4px; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:14px; }
+  .card h2{ font-size:18px; color:var(--brown); margin-bottom:10px; }
+  .step{ display:flex; gap:12px; align-items:flex-start; padding:9px 0; border-bottom:1px solid #f3ece0; }
+  .step:last-child{ border-bottom:none; }
+  .num{ flex-shrink:0; width:30px; height:30px; background:var(--brown); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; }
+  .step .t{ font-size:16px; padding-top:3px; }
+  .btn-row{ display:flex; align-items:center; gap:10px; padding:8px 0; font-size:16px; }
+  .chip{ flex-shrink:0; color:#fff; font-weight:800; border-radius:9px; padding:7px 12px; font-size:14px; min-width:120px; text-align:center; }
+  .c-green{ background:var(--green); } .c-gold{ background:var(--gold); } .c-back{ background:#9a7b53; } .c-brown{ background:#7a4f30; } .c-red{ background:var(--red); }
+  .ex{ background:#fdf6e9; border:1px solid #f0e2c4; border-radius:12px; padding:14px 16px; font-size:15px; color:#5a4a25; }
+  .ex b{ color:var(--brown); }
+  .big-link{ display:block; text-align:center; background:var(--green); color:#fff; font-weight:800; font-size:17px; padding:15px; border-radius:12px; text-decoration:none; margin-top:6px; }
+  .note{ font-size:14px; color:var(--muted); margin-top:6px; }
+  .foot{ text-align:center; color:var(--muted); font-size:13px; margin-top:14px; padding-bottom:10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1>☕ Coffee Money</h1>
+    <div class="s">A simple guide — how to use your money app</div>
+  </div>
+
+  <div class="card">
+    <h2>📲 First: keep it on your phone</h2>
+    <div class="step"><div class="num">1</div><div class="t">Tap the app link.</div></div>
+    <div class="step"><div class="num">2</div><div class="t">Tap your browser menu (the ⋮ or share button).</div></div>
+    <div class="step"><div class="num">3</div><div class="t">Choose <b>“Add to Home Screen.”</b></div></div>
+    <div class="step"><div class="num">4</div><div class="t">Now a <b>Coffee Money icon</b> is on your phone. Just tap it like any app — no link needed again.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>🔘 The buttons — what each one does</h2>
+    <div class="btn-row"><span class="chip c-green">＋ Money</span> When Rashad or Omar gives you money.</div>
+    <div class="btn-row"><span class="chip c-gold">🛒 Item</span> When you buy something with their money.</div>
+    <div class="btn-row"><span class="chip c-back">↩ Give back</span> When you return some of their money.</div>
+    <div class="btn-row"><span class="chip c-brown">🧁 Add a sale</span> When the shop sells something.</div>
+    <div class="btn-row"><span class="chip c-red">💸 Shop expense</span> A shop bill (rent, electricity…).</div>
+  </div>
+
+  <div class="card">
+    <h2>👀 What you see at the top</h2>
+    <p>Two boxes — one for <b>Rashad</b>, one for <b>Omar</b>. Each shows:</p>
+    <div class="step"><div class="num">•</div><div class="t"><b>Brought in</b> — money they gave you.</div></div>
+    <div class="step"><div class="num">•</div><div class="t"><b>Items</b> — what you bought with their money.</div></div>
+    <div class="step"><div class="num">•</div><div class="t"><b>Leftover</b> — their money you have NOT used yet.</div></div>
+    <p class="note">Their money never mixes. You always know whose is whose.</p>
+  </div>
+
+  <div class="card">
+    <h2>✅ A simple example</h2>
+    <div class="ex">
+      Rashad gives you <b>500</b> → tap <b>＋ Money</b> on Rashad.<br><br>
+      You buy a fridge for <b>300</b> with his money → tap <b>🛒 Item</b> on Rashad, write “fridge 300”.<br><br>
+      The app now shows: Rashad <b>leftover = 200</b>. 🎉<br>
+      You never have to remember — the app remembers for you.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>💡 Good to know</h2>
+    <div class="step"><div class="num">•</div><div class="t">It works <b>offline</b> — no internet needed after it opens.</div></div>
+    <div class="step"><div class="num">•</div><div class="t">Your numbers are saved <b>only on your phone</b> — private.</div></div>
+    <div class="step"><div class="num">•</div><div class="t">You can switch <b>LBP / USD</b> at the top.</div></div>
+    <div class="step"><div class="num">•</div><div class="t">Made a mistake? Tap the small <b>×</b> next to any entry to delete it.</div></div>
+  </div>
+
+  <a class="big-link" href="https://aussamayehya51-jpg.github.io/coffee-money/">☕ Open Coffee Money</a>
+
+  <div class="foot">Made for you by OUS Software · +961 71 181 549</div>
+</div>
+</body>
+</html>

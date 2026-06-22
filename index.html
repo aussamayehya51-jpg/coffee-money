@@ -56,6 +56,7 @@
   .empty{ text-align:center; color:var(--muted); padding:18px; }
 
   .pos{ color:var(--green); } .neg{ color:var(--red); }
+  .storewarn{ background:#fdecec; border:1px solid #f3b4b4; color:#a02020; border-radius:12px; padding:12px 14px; font-size:14px; margin-bottom:12px; line-height:1.5; }
   .bg{ position:fixed; inset:0; background:rgba(44,36,25,.55); display:none; align-items:center; justify-content:center; padding:14px; z-index:10; }
   .bg.show{ display:flex; }
   .modal{ background:#fff; border-radius:18px; padding:20px; width:100%; max-width:420px; }
@@ -156,7 +157,21 @@ function withinRange(at, from, to){ if(!from&&!to) return true; const d=String(a
 
 let state, CUR='LBP';
 function load(){ try{ state=JSON.parse(localStorage.getItem('coffeeMoney2')); }catch(e){} if(!state||!state.entries) state=emptyState(); CUR=localStorage.getItem('coffeeCur2')||'LBP'; }
-function save(){ localStorage.setItem('coffeeMoney2', JSON.stringify(state)); }
+let STORAGE_OK = true;
+function save(){
+  try { localStorage.setItem('coffeeMoney2', JSON.stringify(state)); STORAGE_OK = true; }
+  catch(e){ STORAGE_OK = false; showStorageWarning(); }
+}
+function storageWorks(){
+  try { localStorage.setItem('__cm_test','1'); var ok = localStorage.getItem('__cm_test')==='1'; localStorage.removeItem('__cm_test'); return ok; }
+  catch(e){ return false; }
+}
+function showStorageWarning(){
+  if(document.getElementById('storeWarn')) return;
+  var d=document.createElement('div'); d.id='storeWarn'; d.className='storewarn';
+  d.innerHTML='⚠️ This window can’t save your numbers. Please open the app in <b>Chrome</b> or <b>Safari</b> (not inside WhatsApp), then add it to your home screen — your numbers will save there.';
+  var wrap=document.querySelector('.wrap'); wrap.insertBefore(d, wrap.firstChild);
+}
 function setCur(c){ CUR=c; localStorage.setItem('coffeeCur2',c); document.getElementById('cur-lbp').className=c==='LBP'?'on':''; document.getElementById('cur-usd').className=c==='USD'?'on':''; render(); }
 const fmt=(n)=> (Number(n)||0).toLocaleString('en-US')+' '+(CUR==='LBP'?'ل.ل':'$');
 
@@ -194,8 +209,8 @@ function render(){
 function removeEntry(id){ if(confirm('Delete this entry?')){ deleteEntry(state,id); save(); render(); } }
 
 const bg=document.getElementById('bg'), modal=document.getElementById('modal');
-function close(){ bg.classList.remove('show'); }
-bg.onclick=(e)=>{ if(e.target===bg) close(); };
+function closeBox(){ bg.classList.remove('show'); }
+bg.onclick=(e)=>{ if(e.target===bg) closeBox(); };
 function val(id){ return document.getElementById(id).value; }
 
 function openIn(p){
@@ -203,50 +218,50 @@ function openIn(p){
     <div class="help">${PERSON_LABEL[p]} earned money and gave it to you to invest in the shop.</div>
     <div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
     <div class="field"><label>Note (optional)</label><input id="f-note" placeholder="e.g. from his salary"></div>
-    <button class="go" onclick="doIn('${p}')">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+    <button class="go" onclick="doIn('${p}')">Save</button><button class="cancel" onclick="closeBox()">Cancel</button>`;
   bg.classList.add('show');
 }
-function doIn(p){ moneyIn(state,{person:p,amount:val('f-amt'),note:val('f-note')}); save(); close(); render(); }
+function doIn(p){ moneyIn(state,{person:p,amount:val('f-amt'),note:val('f-note')}); save(); closeBox(); render(); }
 
 function openItem(p){
   modal.innerHTML=`<h3>🛒 Bought an item with ${PERSON_LABEL[p]}'s money</h3>
     <div class="help">You bought something for the shop using <b>${PERSON_LABEL[p]}'s</b> money.</div>
     <div class="field"><label>What did you buy?</label><input id="f-item" placeholder="e.g. fridge, flour, cups" autofocus></div>
     <div class="field"><label>How much did it cost?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0"></div>
-    <button class="go" onclick="doItem('${p}')">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+    <button class="go" onclick="doItem('${p}')">Save</button><button class="cancel" onclick="closeBox()">Cancel</button>`;
   bg.classList.add('show');
 }
-function doItem(p){ if(!val('f-item')){alert('Write what you bought.');return;} buyItem(state,{person:p,item:val('f-item'),amount:val('f-amt')}); save(); close(); render(); }
+function doItem(p){ if(!val('f-item')){alert('Write what you bought.');return;} buyItem(state,{person:p,item:val('f-item'),amount:val('f-amt')}); save(); closeBox(); render(); }
 
 function openRepay(p){
   modal.innerHTML=`<h3>↩ Give ${PERSON_LABEL[p]} money back</h3>
     <div class="help">You returned some of ${PERSON_LABEL[p]}'s leftover money to him.</div>
     <div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
-    <button class="go" onclick="doRepay('${p}')">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+    <button class="go" onclick="doRepay('${p}')">Save</button><button class="cancel" onclick="closeBox()">Cancel</button>`;
   bg.classList.add('show');
 }
-function doRepay(p){ repay(state,{person:p,amount:val('f-amt')}); save(); close(); render(); }
+function doRepay(p){ repay(state,{person:p,amount:val('f-amt')}); save(); closeBox(); render(); }
 
 function openSale(){
   modal.innerHTML=`<h3>🧁 Shop sale</h3>
     <div class="field"><label>What did you sell?</label><select id="f-prod">${PRODUCTS.map(x=>'<option>'+x+'</option>').join('')}</select></div>
     <div class="field"><label>How much money?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
-    <button class="go" onclick="doSale()">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+    <button class="go" onclick="doSale()">Save</button><button class="cancel" onclick="closeBox()">Cancel</button>`;
   bg.classList.add('show');
 }
-function doSale(){ sale(state,{product:val('f-prod'),amount:val('f-amt')}); save(); close(); render(); }
+function doSale(){ sale(state,{product:val('f-prod'),amount:val('f-amt')}); save(); closeBox(); render(); }
 
 function openExpense(){
   modal.innerHTML=`<h3>💸 Shop expense</h3>
     <div class="help">A cost that is NOT a kid's item — like rent or electricity.</div>
     <div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
     <div class="field"><label>What for?</label><input id="f-note" placeholder="e.g. rent"></div>
-    <button class="go" onclick="doExpense()">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+    <button class="go" onclick="doExpense()">Save</button><button class="cancel" onclick="closeBox()">Cancel</button>`;
   bg.classList.add('show');
 }
-function doExpense(){ shopExpense(state,{amount:val('f-amt'),note:val('f-note')}); save(); close(); render(); }
+function doExpense(){ shopExpense(state,{amount:val('f-amt'),note:val('f-note')}); save(); closeBox(); render(); }
 
-load(); render();
+load(); render(); if(!storageWorks()) showStorageWarning();
 </script>
 </body>
 </html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#5a3a22" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Coffee Money" />
+<title>Coffee Money</title>
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  :root{ --brown:#5a3a22; --brown2:#7a4f30; --cream:#f7f1e8; --gold:#c8923a; --green:#1f9d57; --red:#d23b3b; --ink:#2c2419; --muted:#8a7a66; --line:#e4d9c8; --blue:#2d6cb5; }
+  body{ font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif; background:var(--cream); color:var(--ink); }
+  .wrap{ max-width:820px; margin:0 auto; padding:14px; }
+  .top{ background:var(--brown); color:#fff; border-radius:16px; padding:16px 20px; text-align:center; margin-bottom:14px; }
+  .top h1{ font-size:22px; } .top .s{ opacity:.85; font-size:13px; margin-top:3px; }
+  .cur{ margin-top:9px; }
+  .cur button{ background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:5px 14px; font-size:13px; cursor:pointer; margin:0 3px; }
+  .cur button.on{ background:#fff; color:var(--brown); font-weight:700; }
+
+  /* two kid folders side by side */
+  .kids{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+  .kid{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .kid h2{ font-size:17px; color:var(--brown); margin-bottom:10px; }
+  .kid .nums{ display:flex; gap:8px; margin-bottom:10px; }
+  .kid .nb{ flex:1; text-align:center; background:var(--cream); border-radius:9px; padding:8px 4px; }
+  .kid .nb .l{ font-size:11px; color:var(--muted); } .kid .nb .v{ font-size:16px; font-weight:800; margin-top:2px; }
+  .leftover{ text-align:center; padding:9px; border-radius:9px; font-weight:800; margin-bottom:10px; }
+  .leftover.good{ background:#e3f6ec; color:var(--green); } .leftover.zero{ background:#eee; color:var(--muted); }
+  .kidbtns{ display:flex; gap:6px; margin-bottom:10px; }
+  .kidbtns button{ flex:1; border:none; border-radius:9px; padding:11px 4px; font-size:13px; font-weight:700; color:#fff; cursor:pointer; }
+  .kb-in{ background:var(--green); } .kb-item{ background:var(--gold); } .kb-back{ background:#9a7b53; }
+  .itemlist{ font-size:13px; }
+  .itemlist .it{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f3ece0; }
+  .itemlist .it:last-child{ border-bottom:none; }
+  .itemlist .it .x{ color:var(--red); cursor:pointer; opacity:.5; padding:0 4px; } .itemlist .it .x:hover{ opacity:1; }
+  .none{ color:var(--muted); font-size:13px; padding:6px 0; }
+
+  /* shop card */
+  .shop{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:14px; }
+  .shop h2{ font-size:16px; color:var(--brown); margin-bottom:10px; }
+  .shop .nums{ display:flex; gap:8px; }
+  .shop .nb{ flex:1; text-align:center; background:var(--cream); border-radius:9px; padding:10px 4px; }
+  .shop .nb .l{ font-size:11px; color:var(--muted); } .shop .nb .v{ font-size:17px; font-weight:800; margin-top:2px; }
+  .shopbtns{ display:flex; gap:8px; margin-top:10px; }
+  .shopbtns button{ flex:1; border:none; border-radius:10px; padding:13px 4px; font-size:14px; font-weight:700; color:#fff; cursor:pointer; }
+  .sb-sale{ background:var(--brown2); } .sb-exp{ background:var(--red); }
+
+  .hist h2{ font-size:15px; color:var(--brown); margin-bottom:8px; }
+  .hitem{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 13px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:14px; }
+  .hitem .del{ color:var(--red); cursor:pointer; font-size:18px; opacity:.5; padding:0 6px; } .hitem .del:hover{ opacity:1; }
+  .empty{ text-align:center; color:var(--muted); padding:18px; }
+
+  .pos{ color:var(--green); } .neg{ color:var(--red); }
+  .bg{ position:fixed; inset:0; background:rgba(44,36,25,.55); display:none; align-items:center; justify-content:center; padding:14px; z-index:10; }
+  .bg.show{ display:flex; }
+  .modal{ background:#fff; border-radius:18px; padding:20px; width:100%; max-width:420px; }
+  .modal h3{ font-size:18px; margin-bottom:14px; }
+  .help{ background:#fdf6e9; border:1px solid #f0e2c4; border-radius:10px; padding:10px 12px; font-size:13px; color:#7a5a20; margin-bottom:14px; }
+  .field{ margin-bottom:13px; }
+  .field label{ display:block; font-size:14px; color:var(--muted); margin-bottom:6px; }
+  .field input, .field select{ width:100%; padding:13px; font-size:17px; border:1px solid var(--line); border-radius:10px; }
+  .go{ width:100%; padding:15px; font-size:17px; font-weight:800; color:#fff; background:var(--brown); border:none; border-radius:12px; cursor:pointer; }
+  .cancel{ width:100%; padding:11px; font-size:14px; color:var(--muted); background:none; border:none; cursor:pointer; margin-top:6px; }
+  @media(max-width:560px){ .kids{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>☕ Coffee Money</h1>
+    <div class="s">Each kid's money & items — kept separate, never mixed.</div>
+    <div class="cur">
+      <button id="cur-lbp" class="on" onclick="setCur('LBP')">LBP ل.ل</button>
+      <button id="cur-usd" onclick="setCur('USD')">USD $</button>
+    </div>
+  </div>
+
+  <div class="kids" id="kids"></div>
+
+  <div class="shop">
+    <h2>☕ The shop itself</h2>
+    <div class="nums">
+      <div class="nb"><div class="l">Sales</div><div class="v pos" id="sh-sales">0</div></div>
+      <div class="nb"><div class="l">Spent</div><div class="v neg" id="sh-spent">0</div></div>
+      <div class="nb"><div class="l">Profit</div><div class="v" id="sh-profit">0</div></div>
+    </div>
+    <div class="shopbtns">
+      <button class="sb-sale" onclick="openSale()">🧁 Add a sale</button>
+      <button class="sb-exp" onclick="openExpense()">💸 Shop expense</button>
+    </div>
+  </div>
+
+  <div class="hist">
+    <h2>📒 Everything that happened</h2>
+    <div id="hist"></div>
+  </div>
+</div>
+
+<div class="bg" id="bg"><div class="modal" id="modal"></div></div>
+
+<script>
+/* ===== Coffee Money — the brain (built in, so this is ONE single file) ===== */
+const PEOPLE = ['x', 'y'];
+const PERSON_LABEL = { x: 'Rashad', y: 'Omar' };
+const PRODUCTS = ['candy', 'cold drinks', 'brownies', 'croissants', 'other'];
+function emptyState(){ return { entries: [], seq: 1 }; }
+function moneyIn(state, o){ return addEntry(state, { type:'in', person:o.person, amount:num(o.amount), note:o.note, date:o.date }); }
+function buyItem(state, o){ return addEntry(state, { type:'item', person:o.person, item:o.item, amount:num(o.amount), note:o.note, date:o.date }); }
+function repay(state, o){ return addEntry(state, { type:'repay', person:o.person, amount:num(o.amount), note:o.note, date:o.date }); }
+function sale(state, o){ return addEntry(state, { type:'sale', product:o.product, amount:num(o.amount), note:o.note, date:o.date }); }
+function shopExpense(state, o){ return addEntry(state, { type:'expense', amount:num(o.amount), note:o.note, date:o.date }); }
+function addEntry(state, e){ const entry={ id:state.seq++, at:e.date||new Date().toISOString(), ...e }; state.entries.push(entry); return entry; }
+function deleteEntry(state, id){ state.entries = state.entries.filter((e)=>e.id!==id); return true; }
+function kidSummary(state, person){
+  let moneyInTotal=0, itemsTotal=0, repaid=0; const items=[], moneyIns=[];
+  for(const e of state.entries){ if(e.person!==person) continue;
+    if(e.type==='in'){ moneyInTotal+=e.amount; moneyIns.push(e); }
+    if(e.type==='item'){ itemsTotal+=e.amount; items.push(e); }
+    if(e.type==='repay') repaid+=e.amount; }
+  return { person, label:PERSON_LABEL[person], money_in:round(moneyInTotal), items_total:round(itemsTotal),
+    repaid:round(repaid), leftover:round(moneyInTotal-itemsTotal-repaid),
+    items:items.map((i)=>({ id:i.id, item:i.item, amount:i.amount, at:i.at, note:i.note })),
+    money_ins:moneyIns.map((i)=>({ id:i.id, amount:i.amount, at:i.at, note:i.note })) };
+}
+function allKids(state){ return PEOPLE.map((p)=>kidSummary(state,p)); }
+function shop(state, fromDate, toDate){
+  const inR=(e)=>withinRange(e.at,fromDate,toDate); let sales=0,itemCost=0,expenses=0;
+  for(const e of state.entries){ if(!inR(e)) continue;
+    if(e.type==='sale') sales+=e.amount; if(e.type==='item') itemCost+=e.amount; if(e.type==='expense') expenses+=e.amount; }
+  const spent=round(itemCost+expenses);
+  return { sales:round(sales), items_bought:round(itemCost), expenses:round(expenses), total_spent:spent, profit:round(sales-spent) };
+}
+function salesByProduct(state, fromDate, toDate){
+  const map={}; for(const e of state.entries){ if(e.type!=='sale'||!withinRange(e.at,fromDate,toDate)) continue;
+    const k=e.product||'other'; map[k]=(map[k]||0)+e.amount; }
+  return Object.entries(map).map(([product,amount])=>({ product, amount:round(amount) })).sort((a,b)=>b.amount-a.amount);
+}
+function history(state, limit){ limit=limit||100; return state.entries.slice().reverse().slice(0,limit).map((e)=>({ id:e.id, at:e.at, type:e.type, person:e.person, amount:e.amount, text:describe(e) })); }
+function describe(e){ const L=PERSON_LABEL;
+  if(e.type==='in') return `${L[e.person]} brought in ${money(e.amount)}${e.note?' — '+e.note:''}`;
+  if(e.type==='item') return `Bought "${e.item}" with ${L[e.person]}'s money: ${money(e.amount)}`;
+  if(e.type==='repay') return `Gave ${L[e.person]} back ${money(e.amount)}${e.note?' — '+e.note:''}`;
+  if(e.type==='sale') return `Sold ${e.product||'item'}: ${money(e.amount)}`;
+  if(e.type==='expense') return `Shop expense ${money(e.amount)}${e.note?' — '+e.note:''}`;
+  return 'entry'; }
+function num(n){ return Math.round((Number(n)||0)*100)/100; }
+function round(n){ return Math.round((Number(n)||0)*100)/100; }
+function money(n){ return (Number(n)||0).toLocaleString('en-US'); }
+function withinRange(at, from, to){ if(!from&&!to) return true; const d=String(at).slice(0,10); if(from&&d<from) return false; if(to&&d>to) return false; return true; }
+/* ===== end brain ===== */
+
+let state, CUR='LBP';
+function load(){ try{ state=JSON.parse(localStorage.getItem('coffeeMoney2')); }catch(e){} if(!state||!state.entries) state=emptyState(); CUR=localStorage.getItem('coffeeCur2')||'LBP'; }
+function save(){ localStorage.setItem('coffeeMoney2', JSON.stringify(state)); }
+function setCur(c){ CUR=c; localStorage.setItem('coffeeCur2',c); document.getElementById('cur-lbp').className=c==='LBP'?'on':''; document.getElementById('cur-usd').className=c==='USD'?'on':''; render(); }
+const fmt=(n)=> (Number(n)||0).toLocaleString('en-US')+' '+(CUR==='LBP'?'ل.ل':'$');
+
+function render(){
+  // two kid folders
+  const kids = allKids(state);
+  document.getElementById('kids').innerHTML = kids.map(k=>`
+    <div class="kid">
+      <h2>${k.label}</h2>
+      <div class="nums">
+        <div class="nb"><div class="l">Brought in</div><div class="v">${fmt(k.money_in)}</div></div>
+        <div class="nb"><div class="l">Items</div><div class="v">${fmt(k.items_total)}</div></div>
+      </div>
+      <div class="leftover ${k.leftover>0?'good':'zero'}">Leftover not used: ${fmt(k.leftover)}</div>
+      <div class="kidbtns">
+        <button class="kb-in" onclick="openIn('${k.person}')">＋ Money</button>
+        <button class="kb-item" onclick="openItem('${k.person}')">🛒 Item</button>
+        <button class="kb-back" onclick="openRepay('${k.person}')">↩ Give back</button>
+      </div>
+      <div class="itemlist">
+        ${k.items.length? k.items.map(i=>`<div class="it"><span>🛒 ${i.item} <span style="color:var(--muted)">— ${fmt(i.amount)}</span></span><span class="x" onclick="removeEntry(${i.id})">×</span></div>`).join('') : `<div class="none">No items bought yet with ${k.label}.</div>`}
+      </div>
+    </div>`).join('');
+
+  // shop
+  const sh = shop(state);
+  document.getElementById('sh-sales').textContent = fmt(sh.sales);
+  document.getElementById('sh-spent').textContent = fmt(sh.total_spent);
+  const pe=document.getElementById('sh-profit'); pe.textContent=fmt(sh.profit); pe.className='v '+(sh.profit>=0?'pos':'neg');
+
+  // history
+  const h = history(state,100);
+  document.getElementById('hist').innerHTML = h.length? h.map(e=>`<div class="hitem"><span>${e.text}</span><span class="del" onclick="removeEntry(${e.id})">×</span></div>`).join('') : '<div class="empty">No entries yet. Use the buttons above to start.</div>';
+}
+function removeEntry(id){ if(confirm('Delete this entry?')){ deleteEntry(state,id); save(); render(); } }
+
+const bg=document.getElementById('bg'), modal=document.getElementById('modal');
+function close(){ bg.classList.remove('show'); }
+bg.onclick=(e)=>{ if(e.target===bg) close(); };
+function val(id){ return document.getElementById(id).value; }
+
+function openIn(p){
+  modal.innerHTML=`<h3>＋ ${PERSON_LABEL[p]} brought money</h3>
+    <div class="help">${PERSON_LABEL[p]} earned money and gave it to you to invest in the shop.</div>
+    <div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
+    <div class="field"><label>Note (optional)</label><input id="f-note" placeholder="e.g. from his salary"></div>
+    <button class="go" onclick="doIn('${p}')">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+  bg.classList.add('show');
+}
+function doIn(p){ moneyIn(state,{person:p,amount:val('f-amt'),note:val('f-note')}); save(); close(); render(); }
+
+function openItem(p){
+  modal.innerHTML=`<h3>🛒 Bought an item with ${PERSON_LABEL[p]}'s money</h3>
+    <div class="help">You bought something for the shop using <b>${PERSON_LABEL[p]}'s</b> money.</div>
+    <div class="field"><label>What did you buy?</label><input id="f-item" placeholder="e.g. fridge, flour, cups" autofocus></div>
+    <div class="field"><label>How much did it cost?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0"></div>
+    <button class="go" onclick="doItem('${p}')">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+  bg.classList.add('show');
+}
+function doItem(p){ if(!val('f-item')){alert('Write what you bought.');return;} buyItem(state,{person:p,item:val('f-item'),amount:val('f-amt')}); save(); close(); render(); }
+
+function openRepay(p){
+  modal.innerHTML=`<h3>↩ Give ${PERSON_LABEL[p]} money back</h3>
+    <div class="help">You returned some of ${PERSON_LABEL[p]}'s leftover money to him.</div>
+    <div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
+    <button class="go" onclick="doRepay('${p}')">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+  bg.classList.add('show');
+}
+function doRepay(p){ repay(state,{person:p,amount:val('f-amt')}); save(); close(); render(); }
+
+function openSale(){
+  modal.innerHTML=`<h3>🧁 Shop sale</h3>
+    <div class="field"><label>What did you sell?</label><select id="f-prod">${PRODUCTS.map(x=>'<option>'+x+'</option>').join('')}</select></div>
+    <div class="field"><label>How much money?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
+    <button class="go" onclick="doSale()">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+  bg.classList.add('show');
+}
+function doSale(){ sale(state,{product:val('f-prod'),amount:val('f-amt')}); save(); close(); render(); }
+
+function openExpense(){
+  modal.innerHTML=`<h3>💸 Shop expense</h3>
+    <div class="help">A cost that is NOT a kid's item — like rent or electricity.</div>
+    <div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>
+    <div class="field"><label>What for?</label><input id="f-note" placeholder="e.g. rent"></div>
+    <button class="go" onclick="doExpense()">Save</button><button class="cancel" onclick="close()">Cancel</button>`;
+  bg.classList.add('show');
+}
+function doExpense(){ shopExpense(state,{amount:val('f-amt'),note:val('f-note')}); save(); close(); render(); }
+
+load(); render();
+</script>
+</body>
+</html>

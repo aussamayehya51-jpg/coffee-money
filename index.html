@@ -156,23 +156,27 @@ function withinRange(at, from, to){ if(!from&&!to) return true; const d=String(a
 /* ===== end brain ===== */
 
 let state, CUR='LBP';
-function load(){ try{ state=JSON.parse(localStorage.getItem('coffeeMoney2')); }catch(e){} if(!state||!state.entries) state=emptyState(); CUR=localStorage.getItem('coffeeCur2')||'LBP'; }
-let STORAGE_OK = true;
+function load(){ try{ state=JSON.parse(localStorage.getItem('coffeeMoney2')); }catch(e){} if(!state||!state.entries) state=emptyState(); try{ CUR=localStorage.getItem('coffeeCur2')||'LBP'; }catch(e){ CUR='LBP'; } }
+let STORAGE_OK = true, STORAGE_ERR = '';
 function save(){
   try { localStorage.setItem('coffeeMoney2', JSON.stringify(state)); STORAGE_OK = true; }
-  catch(e){ STORAGE_OK = false; showStorageWarning(); }
+  catch(e){ STORAGE_OK = false; STORAGE_ERR = ((e&&e.name)||'Error')+': '+((e&&e.message)||String(e)); showStorageWarning(); }
 }
 function storageWorks(){
   try { localStorage.setItem('__cm_test','1'); var ok = localStorage.getItem('__cm_test')==='1'; localStorage.removeItem('__cm_test'); return ok; }
-  catch(e){ return false; }
+  catch(e){ STORAGE_ERR = ((e&&e.name)||'Error')+': '+((e&&e.message)||String(e)); return false; }
 }
 function showStorageWarning(){
   if(document.getElementById('storeWarn')) return;
   var d=document.createElement('div'); d.id='storeWarn'; d.className='storewarn';
-  d.innerHTML='⚠️ This window can’t save your numbers. Please open the app in <b>Chrome</b> or <b>Safari</b> (not inside WhatsApp), then add it to your home screen — your numbers will save there.';
+  var mode = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ? 'home-icon' : 'browser-tab';
+  d.innerHTML='⚠️ This window can’t save your numbers. Please open the app in <b>Chrome</b> or <b>Safari</b> (not inside WhatsApp), then add it to your home screen — your numbers will save there.'
+    + '<div style="margin-top:8px;font-size:11px;color:#7a3030;border-top:1px solid #f3b4b4;padding-top:6px">For support → reason: <b>'
+    + (STORAGE_ERR||'storage blocked') + '</b> · cookies: <b>' + (navigator.cookieEnabled?'ON':'OFF')
+    + '</b> · opened as: <b>' + mode + '</b></div>';
   var wrap=document.querySelector('.wrap'); wrap.insertBefore(d, wrap.firstChild);
 }
-function setCur(c){ CUR=c; localStorage.setItem('coffeeCur2',c); document.getElementById('cur-lbp').className=c==='LBP'?'on':''; document.getElementById('cur-usd').className=c==='USD'?'on':''; render(); }
+function setCur(c){ CUR=c; try{ localStorage.setItem('coffeeCur2',c); }catch(e){} document.getElementById('cur-lbp').className=c==='LBP'?'on':''; document.getElementById('cur-usd').className=c==='USD'?'on':''; render(); }
 const fmt=(n)=> (Number(n)||0).toLocaleString('en-US')+' '+(CUR==='LBP'?'ل.ل':'$');
 
 function render(){

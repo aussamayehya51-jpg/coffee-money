@@ -262,6 +262,12 @@ function openExpense(){
 function doExpense(){ shopExpense(state,{amount:val('f-amt'),note:val('f-note')}); save(); closeBox(); render(); }
 
 load(); render(); if(!storageWorks()) showStorageWarning();
+
+// Offline + auto-update: cache the app so it opens with no internet,
+// and quietly fetch the newest version whenever there IS internet.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
 </script>
 </body>
 </html>

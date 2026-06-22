@@ -25,6 +25,10 @@
   .ex b{ color:var(--brown); }
   .big-link{ display:block; text-align:center; background:var(--green); color:#fff; font-weight:800; font-size:17px; padding:15px; border-radius:12px; text-decoration:none; margin-top:6px; }
   .note{ font-size:14px; color:var(--muted); margin-top:6px; }
+  .good-box{ background:#e3f6ec; border:1px solid #b9e3cb; border-radius:12px; padding:14px 16px; font-size:16px; color:#176b3d; }
+  .good-box b{ color:#0f5a31; }
+  .warn{ background:#fff4e0; border:1px solid #f0d49a; border-radius:12px; padding:12px 14px; font-size:15px; color:#8a5a12; margin-bottom:12px; }
+  .phone{ font-weight:800; color:var(--brown); margin:12px 0 4px; font-size:16px; }
   .foot{ text-align:center; color:var(--muted); font-size:13px; margin-top:14px; padding-bottom:10px; }
 </style>
 </head>
@@ -37,11 +41,25 @@
   </div>
 
   <div class="card">
-    <h2>📲 First: keep it on your phone</h2>
-    <div class="step"><div class="num">1</div><div class="t">Tap the app link.</div></div>
-    <div class="step"><div class="num">2</div><div class="t">Tap your browser menu (the ⋮ or share button).</div></div>
-    <div class="step"><div class="num">3</div><div class="t">Choose <b>“Add to Home Screen.”</b></div></div>
-    <div class="step"><div class="num">4</div><div class="t">Now a <b>Coffee Money icon</b> is on your phone. Just tap it like any app — no link needed again.</div></div>
+    <h2>✅ You can use it right now</h2>
+    <div class="good-box">Just <b>tap the link</b> and start — the app works straight away! 🎉<br><br>The icon below is <b>optional</b> — it only saves you from finding the link each time.</div>
+  </div>
+
+  <div class="card">
+    <h2>📲 To put an icon on your phone (optional)</h2>
+    <div class="warn">⚠️ <b>Important:</b> if you opened the link inside <b>WhatsApp</b>, you must first open it in your <b>real browser</b> — WhatsApp's own window can’t make an icon.</div>
+
+    <div class="phone">📱 On iPhone</div>
+    <div class="step"><div class="num">1</div><div class="t">Tap the small <b>compass / Safari</b> icon in the bottom corner to open it in Safari.</div></div>
+    <div class="step"><div class="num">2</div><div class="t">Tap <b>Share</b> (the box with an ↑ arrow).</div></div>
+    <div class="step"><div class="num">3</div><div class="t">Scroll down and tap <b>“Add to Home Screen.”</b></div></div>
+
+    <div class="phone">🤖 On Android</div>
+    <div class="step"><div class="num">1</div><div class="t">Tap the <b>⋮</b> (three dots, top corner) → <b>“Open in Chrome.”</b></div></div>
+    <div class="step"><div class="num">2</div><div class="t">In Chrome, tap <b>⋮</b> again.</div></div>
+    <div class="step"><div class="num">3</div><div class="t">Tap <b>“Add to Home screen.”</b></div></div>
+
+    <p class="note">Now a <b>Coffee Money icon</b> is on your phone. Tap it like any app — no link needed again.</p>
   </div>
 
   <div class="card">

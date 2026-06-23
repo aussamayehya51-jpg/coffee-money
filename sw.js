@@ -1,5 +1,5 @@
 /* Coffee Money — service worker: works offline + auto-updates when online */
-const CACHE = 'coffee-money-v1';
+const CACHE = 'coffee-money-v2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 // Install: pre-cache the app so it opens with no internet

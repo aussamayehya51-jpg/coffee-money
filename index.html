@@ -48,6 +48,9 @@
   .hitem{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px 13px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:14px; gap:8px; }
   .hitem .del{ color:var(--red); cursor:pointer; font-size:18px; opacity:.5; padding:0 6px; } .hitem .del:hover{ opacity:1; }
   .empty{ text-align:center; color:var(--muted); padding:18px; }
+  .htext{ flex:1; } .hdate{ font-size:11px; color:var(--muted); margin-top:3px; font-weight:600; }
+  .shopbook{ margin-bottom:12px; } .shopbook:last-of-type{ margin-bottom:0; }
+  .bookname{ font-size:13px; font-weight:800; color:var(--brown); margin:2px 0 6px; }
 
   .pos{ color:var(--green); } .neg{ color:var(--red); }
   .storewarn{ background:#fdecec; border:1px solid #f3b4b4; color:#a02020; border-radius:12px; padding:12px 14px; font-size:14px; margin-bottom:12px; line-height:1.5; }
@@ -81,11 +84,7 @@
 
   <div class="shop">
     <h2>☕ The shop</h2>
-    <div class="nums">
-      <div class="nb"><div class="l">Sales</div><div class="v pos" id="sh-sales">0</div></div>
-      <div class="nb"><div class="l">Buy</div><div class="v neg" id="sh-buy">0</div></div>
-      <div class="nb"><div class="l">Profit</div><div class="v" id="sh-profit">0</div></div>
-    </div>
+    <div id="shop-books"></div>
     <div class="shopbtns">
       <button class="sb-sale" onclick="openSale()">🧁 Sales</button>
       <button class="sb-buy" onclick="openBuy()">🛒 Buy</button>
@@ -121,7 +120,7 @@ function shopSummary(s,cur){
   s.entries.forEach(function(e){ if(e.currency!==cur) return; if(e.type==='sale') sales+=e.amount; if(e.type==='buy') buys+=e.amount; });
   return { sales:round(sales), buy:round(buys), profit:round(sales-buys) };
 }
-function history(s,cur,limit){ limit=limit||200; return s.entries.filter(function(e){ return e.currency===cur; }).slice().reverse().slice(0,limit).map(function(e){ return { id:e.id, text:describe(e) }; }); }
+function history(s,cur,limit){ limit=limit||200; return s.entries.filter(function(e){ return e.currency===cur; }).slice().reverse().slice(0,limit).map(function(e){ return { id:e.id, at:e.at, text:describe(e) }; }); }
 function describe(e){ var L=PERSON_LABEL;
   if(e.type==='in') return L[e.person]+' — Cash in '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
   if(e.type==='out') return L[e.person]+' — Cash out '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
@@ -172,6 +171,8 @@ function showStorageWarning(){
 function setCur(c){ CUR=c; try{ localStorage.setItem('coffeeCur2',c); }catch(e){} document.getElementById('cur-lbp').className=c==='LBP'?'on':''; document.getElementById('cur-usd').className=c==='USD'?'on':''; render(); }
 function fmt(n){ return money(n,CUR); }
 function curWord(){ return CUR==='USD'?'Dollars $':'Lira ل.ل'; }
+function fmtDate(at){ var d=new Date(at); if(isNaN(d.getTime())) return ''; var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; var h=d.getHours(),mi=d.getMinutes(),ap=h>=12?'PM':'AM',h12=h%12||12,mm=(mi<10?'0':'')+mi; return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+' · '+h12+':'+mm+' '+ap; }
+function shopBlock(cur){ var sh=shopSummary(state,cur); var label=cur==='USD'?'Dollars ($)':'Lira (ل.ل)'; return '<div class="shopbook"><div class="bookname">'+label+'</div><div class="nums">'+'<div class="nb"><div class="l">Sales</div><div class="v pos">'+money(sh.sales,cur)+'</div></div>'+'<div class="nb"><div class="l">Buy</div><div class="v neg">'+money(sh.buy,cur)+'</div></div>'+'<div class="nb"><div class="l">Profit</div><div class="v '+(sh.profit>=0?'pos':'neg')+'">'+money(sh.profit,cur)+'</div></div>'+'</div></div>'; }
 
 function render(){
   var cur=CUR;
@@ -190,12 +191,9 @@ function render(){
       +'<button class="kb-out" onclick="openOut(\''+p+'\')">－ Cash out</button>'
       +'</div></div>';
   }).join('');
-  var sh=shopSummary(state,cur);
-  document.getElementById('sh-sales').textContent=fmt(sh.sales);
-  document.getElementById('sh-buy').textContent=fmt(sh.buy);
-  var pe=document.getElementById('sh-profit'); pe.textContent=fmt(sh.profit); pe.className='v '+(sh.profit>=0?'pos':'neg');
+  document.getElementById('shop-books').innerHTML = shopBlock('LBP') + shopBlock('USD');
   var h=history(state,cur,200);
-  document.getElementById('hist').innerHTML = h.length ? h.map(function(e){ return '<div class="hitem"><span>'+e.text+'</span><span class="del" onclick="removeEntry('+e.id+')">×</span></div>'; }).join('') : '<div class="empty">Nothing yet in this book. Use the buttons above to start.</div>';
+  document.getElementById('hist').innerHTML = h.length ? h.map(function(e){ return '<div class="hitem"><span class="htext">'+e.text+'<div class="hdate">'+fmtDate(e.at)+'</div></span><span class="del" onclick="removeEntry('+e.id+')">×</span></div>'; }).join('') : '<div class="empty">Nothing yet in this book. Use the buttons above to start.</div>';
 }
 function removeEntry(id){ if(confirm('Delete this entry?')){ deleteEntry(state,id); save(); render(); } }
 

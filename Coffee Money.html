@@ -73,7 +73,7 @@
 <div class="wrap">
   <div class="top">
     <h1>☕ Coffee Money</h1>
-    <div class="s">Each son's cash + the shop — Dollars and Lira kept separate.</div>
+    <div class="s">Everyone's cash + the shop — Dollars and Lira kept separate.</div>
     <div class="cur">
       <button id="cur-lbp" class="on" onclick="setCur('LBP')">LBP ل.ل</button>
       <button id="cur-usd" onclick="setCur('USD')">USD $</button>
@@ -88,8 +88,8 @@
     <h2>☕ The shop</h2>
     <div id="shop-books"></div>
     <div class="shopbtns">
-      <button class="sb-sale" onclick="openSale()">🧁 Sales</button>
-      <button class="sb-buy" onclick="openBuy()">🛒 Buy</button>
+      <button class="sb-sale" onclick="openSale()">🧁 Sales / In</button>
+      <button class="sb-buy" onclick="openBuy()">🛒 Buy / Out</button>
     </div>
   </div>
 
@@ -108,8 +108,8 @@
 
 <script>
 /* ===== Coffee Money — single file ===== */
-const PEOPLE = ['x','y'];
-const PERSON_LABEL = { x:'Rashad', y:'Omar' };
+const PEOPLE = ['x','y','z'];
+const PERSON_LABEL = { x:'Rashad', y:'Omar', z:'Rabih' };
 function emptyState(){ return { entries:[], seq:1 }; }
 function addEntry(s,e){ e.id=s.seq++; e.at=new Date().toISOString(); s.entries.push(e); return e; }
 function cashIn(s,o){ return addEntry(s,{ type:'in', person:o.person, currency:o.currency, amount:num(o.amount), note:o.note }); }
@@ -131,8 +131,8 @@ function history(s,cur,limit){ limit=limit||200; return s.entries.filter(functio
 function describe(e){ var L=PERSON_LABEL;
   if(e.type==='in') return L[e.person]+' — Cash in '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
   if(e.type==='out') return L[e.person]+' — Cash out '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
-  if(e.type==='sale') return 'Sales '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
-  if(e.type==='buy') return 'Buy '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
+  if(e.type==='sale') return 'Sales / In '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
+  if(e.type==='buy') return 'Buy / Out '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
   return 'entry';
 }
 function num(n){ return Math.round((Number(n)||0)*100)/100; }
@@ -179,7 +179,7 @@ function setCur(c){ CUR=c; try{ localStorage.setItem('coffeeCur2',c); }catch(e){
 function fmt(n){ return money(n,CUR); }
 function curWord(){ return CUR==='USD'?'Dollars $':'Lira ل.ل'; }
 function fmtDate(at){ var d=new Date(at); if(isNaN(d.getTime())) return ''; var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; var h=d.getHours(),mi=d.getMinutes(),ap=h>=12?'PM':'AM',h12=h%12||12,mm=(mi<10?'0':'')+mi; return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+' · '+h12+':'+mm+' '+ap; }
-function shopBlock(cur){ var sh=shopSummary(state,cur); var label=cur==='USD'?'Dollars ($)':'Lira (ل.ل)'; return '<div class="shopbook"><div class="bookname">'+label+'</div><div class="nums">'+'<div class="nb"><div class="l">Sales</div><div class="v pos">'+money(sh.sales,cur)+'</div></div>'+'<div class="nb"><div class="l">Buy</div><div class="v neg">'+money(sh.buy,cur)+'</div></div>'+'<div class="nb"><div class="l">Profit</div><div class="v '+(sh.profit>=0?'pos':'neg')+'">'+money(sh.profit,cur)+'</div></div>'+'</div></div>'; }
+function shopBlock(cur){ var sh=shopSummary(state,cur); var label=cur==='USD'?'Dollars ($)':'Lira (ل.ل)'; return '<div class="shopbook"><div class="bookname">'+label+'</div><div class="nums">'+'<div class="nb"><div class="l">Sales / In</div><div class="v pos">'+money(sh.sales,cur)+'</div></div>'+'<div class="nb"><div class="l">Buy / Out</div><div class="v neg">'+money(sh.buy,cur)+'</div></div>'+'<div class="nb"><div class="l">Profit</div><div class="v '+(sh.profit>=0?'pos':'neg')+'">'+money(sh.profit,cur)+'</div></div>'+'</div></div>'; }
 
 function render(){
   var cur=CUR;
@@ -230,7 +230,7 @@ function openOut(p){
 function doOut(p){ cashOut(state,{ person:p, currency:CUR, amount:val('f-amt'), note:val('f-note') }); save(); closeBox(); render(); }
 
 function openSale(){
-  modal.innerHTML='<h3>🧁 Sales</h3>'
+  modal.innerHTML='<h3>🧁 Sales / In</h3>'
     +'<div class="help">Money the shop made by selling. In <b>'+curWord()+'</b>.</div>'
     +'<div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>'
     +'<div class="field"><label>What did you sell? (optional)</label><input id="f-note" placeholder="e.g. coffee, cold drinks"></div>'
@@ -240,7 +240,7 @@ function openSale(){
 function doSale(){ sale(state,{ currency:CUR, amount:val('f-amt'), note:val('f-note') }); save(); closeBox(); render(); }
 
 function openBuy(){
-  modal.innerHTML='<h3>🛒 Buy</h3>'
+  modal.innerHTML='<h3>🛒 Buy / Out</h3>'
     +'<div class="help">Money you spent buying things for the shop. In <b>'+curWord()+'</b>.</div>'
     +'<div class="field"><label>How much?</label><input id="f-amt" type="number" inputmode="decimal" placeholder="0" autofocus></div>'
     +'<div class="field"><label>What did you buy? (optional)</label><input id="f-note" placeholder="e.g. coffee beans, cups"></div>'

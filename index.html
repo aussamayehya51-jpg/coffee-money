@@ -22,6 +22,9 @@
   .cur button{ background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:7px 16px; font-size:14px; font-weight:700; cursor:pointer; margin:0 3px; }
   .cur button.on{ background:#fff; color:var(--brown); }
   .curlabel{ text-align:center; font-size:13px; color:var(--muted); margin:0 0 12px; font-weight:700; }
+  .monthbar{ display:flex; align-items:center; justify-content:center; gap:14px; margin:0 0 12px; }
+  .monthbar button{ background:var(--brown); color:#fff; border:none; border-radius:50%; width:38px; height:38px; font-size:15px; cursor:pointer; }
+  .mlabel{ font-weight:800; color:var(--brown); font-size:16px; min-width:150px; text-align:center; }
 
   .kids{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
   .kid{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
@@ -82,6 +85,12 @@
 
   <div class="curlabel" id="curlabel"></div>
 
+  <div class="monthbar">
+    <button onclick="changeMonth(-1)" title="Previous month">◀</button>
+    <div id="mLabel" class="mlabel"></div>
+    <button onclick="changeMonth(1)" title="Next month">▶</button>
+  </div>
+
   <div class="kids" id="kids"></div>
 
   <div class="shop">
@@ -117,17 +126,17 @@ function cashOut(s,o){ return addEntry(s,{ type:'out', person:o.person, currency
 function sale(s,o){ return addEntry(s,{ type:'sale', currency:o.currency, amount:num(o.amount), note:o.note }); }
 function buy(s,o){ return addEntry(s,{ type:'buy', currency:o.currency, amount:num(o.amount), note:o.note }); }
 function deleteEntry(s,id){ s.entries = s.entries.filter(function(e){ return e.id!==id; }); }
-function kidSummary(s,person,cur){
+function kidSummary(s,person,cur,month){
   var cin=0,cout=0;
-  s.entries.forEach(function(e){ if(e.person!==person||e.currency!==cur) return; if(e.type==='in') cin+=e.amount; if(e.type==='out') cout+=e.amount; });
+  s.entries.forEach(function(e){ if(e.person!==person||e.currency!==cur||!inMonth(e.at,month)) return; if(e.type==='in') cin+=e.amount; if(e.type==='out') cout+=e.amount; });
   return { person:person, label:PERSON_LABEL[person], cash_in:round(cin), cash_out:round(cout), balance:round(cin-cout) };
 }
-function shopSummary(s,cur){
+function shopSummary(s,cur,month){
   var sales=0,buys=0;
-  s.entries.forEach(function(e){ if(e.currency!==cur) return; if(e.type==='sale') sales+=e.amount; if(e.type==='buy') buys+=e.amount; });
+  s.entries.forEach(function(e){ if(e.currency!==cur||!inMonth(e.at,month)) return; if(e.type==='sale') sales+=e.amount; if(e.type==='buy') buys+=e.amount; });
   return { sales:round(sales), buy:round(buys), profit:round(sales-buys) };
 }
-function history(s,cur,limit){ limit=limit||200; return s.entries.filter(function(e){ return e.currency===cur; }).slice().reverse().slice(0,limit).map(function(e){ return { id:e.id, at:e.at, text:describe(e) }; }); }
+function history(s,cur,month,limit){ limit=limit||200; return s.entries.filter(function(e){ return e.currency===cur && inMonth(e.at,month); }).slice().reverse().slice(0,limit).map(function(e){ return { id:e.id, at:e.at, text:describe(e) }; }); }
 function describe(e){ var L=PERSON_LABEL;
   if(e.type==='in') return L[e.person]+' — Cash in '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
   if(e.type==='out') return L[e.person]+' — Cash out '+money(e.amount,e.currency)+(e.note?' · '+e.note:'');
@@ -140,7 +149,7 @@ function round(n){ return Math.round((Number(n)||0)*100)/100; }
 function money(n,cur){ n=Number(n)||0; return cur==='USD' ? '$'+n.toLocaleString('en-US') : n.toLocaleString('en-US')+' ل.ل'; }
 /* ===== end logic ===== */
 
-let state, CUR='LBP', STORAGE_OK=true, STORAGE_ERR='';
+let state, CUR='LBP', STORAGE_OK=true, STORAGE_ERR='', selMonth=new Date().toISOString().slice(0,7);
 function migrate(s){
   s.entries.forEach(function(e){
     if(!e.currency) e.currency='LBP';
@@ -179,15 +188,26 @@ function setCur(c){ CUR=c; try{ localStorage.setItem('coffeeCur2',c); }catch(e){
 function fmt(n){ return money(n,CUR); }
 function curWord(){ return CUR==='USD'?'Dollars $':'Lira ل.ل'; }
 function fmtDate(at){ var d=new Date(at); if(isNaN(d.getTime())) return ''; var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; var h=d.getHours(),mi=d.getMinutes(),ap=h>=12?'PM':'AM',h12=h%12||12,mm=(mi<10?'0':'')+mi; return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+' · '+h12+':'+mm+' '+ap; }
-function shopBlock(cur){ var sh=shopSummary(state,cur); var label=cur==='USD'?'Dollars ($)':'Lira (ل.ل)'; return '<div class="shopbook"><div class="bookname">'+label+'</div><div class="nums">'+'<div class="nb"><div class="l">Sales / In</div><div class="v pos">'+money(sh.sales,cur)+'</div></div>'+'<div class="nb"><div class="l">Buy / Out</div><div class="v neg">'+money(sh.buy,cur)+'</div></div>'+'<div class="nb"><div class="l">Profit</div><div class="v '+(sh.profit>=0?'pos':'neg')+'">'+money(sh.profit,cur)+'</div></div>'+'</div></div>'; }
+function inMonth(at,ym){ return String(at||'').slice(0,7)===ym; }
+function monthLabel(ym){ var M=['January','February','March','April','May','June','July','August','September','October','November','December']; var p=String(ym).split('-'); return (M[parseInt(p[1],10)-1]||'')+' '+p[0]; }
+function changeMonth(d){ var p=selMonth.split('-').map(Number),y=p[0],m=p[1]+d; if(m<1){m=12;y--;} if(m>12){m=1;y++;} selMonth=y+'-'+String(m).padStart(2,'0'); render(); }
+function openPersonHistory(p){
+  var L=PERSON_LABEL[p];
+  var items=state.entries.filter(function(e){ return e.person===p && e.currency===CUR && inMonth(e.at,selMonth); }).slice().reverse();
+  var rows=items.length ? items.map(function(e){ return '<div class="hitem"><span class="htext">'+describe(e)+'<div class="hdate">'+fmtDate(e.at)+'</div></span><span class="del" onclick="removeEntry('+e.id+')">×</span></div>'; }).join('') : '<div class="empty">No entries for '+L+' in '+monthLabel(selMonth)+'.</div>';
+  modal.innerHTML='<h3>📒 '+L+' — '+monthLabel(selMonth)+'</h3>'+rows+'<button class="cancel" onclick="closeBox()">Close</button>';
+  bg.classList.add('show');
+}
+function shopBlock(cur){ var sh=shopSummary(state,cur,selMonth); var label=cur==='USD'?'Dollars ($)':'Lira (ل.ل)'; return '<div class="shopbook"><div class="bookname">'+label+'</div><div class="nums">'+'<div class="nb"><div class="l">Sales / In</div><div class="v pos">'+money(sh.sales,cur)+'</div></div>'+'<div class="nb"><div class="l">Buy / Out</div><div class="v neg">'+money(sh.buy,cur)+'</div></div>'+'<div class="nb"><div class="l">Profit</div><div class="v '+(sh.profit>=0?'pos':'neg')+'">'+money(sh.profit,cur)+'</div></div>'+'</div></div>'; }
 
 function render(){
   var cur=CUR;
+  document.getElementById('mLabel').textContent = monthLabel(selMonth);
   document.getElementById('curlabel').textContent = cur==='USD' ? '💵 You are in the Dollars book ($)' : '💵 You are in the Lira book (ل.ل)';
   document.getElementById('kids').innerHTML = PEOPLE.map(function(p){
-    var k=kidSummary(state,p,cur);
+    var k=kidSummary(state,p,cur,selMonth);
     var cls = k.balance>0?'good':(k.balance<0?'bad':'zero');
-    return '<div class="kid"><h2>'+k.label+'</h2>'
+    return '<div class="kid"><h2 onclick="openPersonHistory(\''+p+'\')" style="cursor:pointer">'+k.label+' 📒</h2>'
       +'<div class="nums">'
       +'<div class="nb"><div class="l">Cash in</div><div class="v">'+fmt(k.cash_in)+'</div></div>'
       +'<div class="nb"><div class="l">Cash out</div><div class="v">'+fmt(k.cash_out)+'</div></div>'
@@ -199,7 +219,7 @@ function render(){
       +'</div></div>';
   }).join('');
   document.getElementById('shop-books').innerHTML = shopBlock('LBP') + shopBlock('USD');
-  var h=history(state,cur,200);
+  var h=history(state,cur,selMonth,200);
   document.getElementById('hist').innerHTML = h.length ? h.map(function(e){ return '<div class="hitem"><span class="htext">'+e.text+'<div class="hdate">'+fmtDate(e.at)+'</div></span><span class="del" onclick="removeEntry('+e.id+')">×</span></div>'; }).join('') : '<div class="empty">Nothing yet in this book. Use the buttons above to start.</div>';
 }
 function removeEntry(id){ if(confirm('Delete this entry?')){ deleteEntry(state,id); save(); render(); } }

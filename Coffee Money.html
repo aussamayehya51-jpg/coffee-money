@@ -118,7 +118,7 @@
 <script>
 /* ===== Coffee Money — single file ===== */
 const PEOPLE = ['x','y','z','s'];
-const PERSON_LABEL = { x:'Rashad', y:'Omar', z:'Rabih', s:'Coffee Shop' };
+const PERSON_LABEL = { x:'Rashad', y:'Omar', z:'Rabih', s:'Shop cash' };
 function emptyState(){ return { entries:[], seq:1 }; }
 function addEntry(s,e){ e.id=s.seq++; e.at=new Date().toISOString(); s.entries.push(e); return e; }
 function cashIn(s,o){ return addEntry(s,{ type:'in', person:o.person, currency:o.currency, amount:num(o.amount), note:o.note }); }

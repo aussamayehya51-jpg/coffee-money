@@ -37,6 +37,8 @@
   .kidbtns{ display:flex; gap:8px; }
   .kidbtns button{ flex:1; border:none; border-radius:9px; padding:12px 4px; font-size:14px; font-weight:700; color:#fff; cursor:pointer; }
   .kb-in{ background:var(--green); } .kb-out{ background:var(--orange); }
+  .seehist{ text-align:center; margin-top:9px; padding:9px; border-radius:9px; background:var(--cream); color:var(--brown); font-size:13px; font-weight:800; cursor:pointer; border:1px dashed var(--gold); }
+  .seehist:active{ background:#efe4d2; }
 
   .shop{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:14px; }
   .shop h2{ font-size:16px; color:var(--brown); margin-bottom:10px; }
@@ -216,7 +218,9 @@ function render(){
       +'<div class="kidbtns">'
       +'<button class="kb-in" onclick="openIn(\''+p+'\')">＋ Cash in</button>'
       +'<button class="kb-out" onclick="openOut(\''+p+'\')">－ Cash out</button>'
-      +'</div></div>';
+      +'</div>'
+      +'<div class="seehist" onclick="openPersonHistory(\''+p+'\')">📒 What happened — '+k.label+'</div>'
+      +'</div>';
   }).join('');
   document.getElementById('shop-books').innerHTML = shopBlock('LBP') + shopBlock('USD');
   var h=history(state,cur,selMonth,200);

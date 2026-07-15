@@ -102,6 +102,7 @@
       <button class="sb-sale" onclick="openSale()">🧁 Sales / In</button>
       <button class="sb-buy" onclick="openBuy()">🛒 Buy / Out</button>
     </div>
+    <div class="seehist" style="margin-top:10px" onclick="openShopHistory()">📒 What happened — the shop</div>
   </div>
 
   <div class="hist">
@@ -119,7 +120,7 @@
 
 <script>
 /* ===== Coffee Money — single file ===== */
-const PEOPLE = ['x','y','z','s'];
+const PEOPLE = ['x','y','z'];
 const PERSON_LABEL = { x:'Rashad', y:'Omar', z:'Rabih', s:'Shop cash' };
 function emptyState(){ return { entries:[], seq:1 }; }
 function addEntry(s,e){ e.id=s.seq++; e.at=new Date().toISOString(); s.entries.push(e); return e; }
@@ -200,6 +201,12 @@ function openPersonHistory(p){
   modal.innerHTML='<h3>📒 '+L+' — '+monthLabel(selMonth)+'</h3>'+rows+'<button class="cancel" onclick="closeBox()">Close</button>';
   bg.classList.add('show');
 }
+function openShopHistory(){
+  var items=state.entries.filter(function(e){ return (e.type==='sale'||e.type==='buy') && e.currency===CUR && inMonth(e.at,selMonth); }).slice().reverse();
+  var rows=items.length ? items.map(function(e){ return '<div class="hitem"><span class="htext">'+describe(e)+'<div class="hdate">'+fmtDate(e.at)+'</div></span><span class="del" onclick="removeEntry('+e.id+')">×</span></div>'; }).join('') : '<div class="empty">No shop entries in '+monthLabel(selMonth)+'.</div>';
+  modal.innerHTML='<h3>📒 The shop — '+monthLabel(selMonth)+'</h3>'+rows+'<button class="cancel" onclick="closeBox()">Close</button>';
+  bg.classList.add('show');
+}
 function shopBlock(cur){ var sh=shopSummary(state,cur,selMonth); var label=cur==='USD'?'Dollars ($)':'Lira (ل.ل)'; return '<div class="shopbook"><div class="bookname">'+label+'</div><div class="nums">'+'<div class="nb"><div class="l">Sales / In</div><div class="v pos">'+money(sh.sales,cur)+'</div></div>'+'<div class="nb"><div class="l">Buy / Out</div><div class="v neg">'+money(sh.buy,cur)+'</div></div>'+'<div class="nb"><div class="l">Profit</div><div class="v '+(sh.profit>=0?'pos':'neg')+'">'+money(sh.profit,cur)+'</div></div>'+'</div></div>'; }
 
 function render(){
@@ -209,7 +216,7 @@ function render(){
   document.getElementById('kids').innerHTML = PEOPLE.map(function(p){
     var k=kidSummary(state,p,cur,selMonth);
     var cls = k.balance>0?'good':(k.balance<0?'bad':'zero');
-    return '<div class="kid"><h2 onclick="openPersonHistory(\''+p+'\')" style="cursor:pointer">'+k.label+' 📒</h2>'
+    return '<div class="kid"><h2>'+k.label+'</h2>'
       +'<div class="nums">'
       +'<div class="nb"><div class="l">Cash in</div><div class="v">'+fmt(k.cash_in)+'</div></div>'
       +'<div class="nb"><div class="l">Cash out</div><div class="v">'+fmt(k.cash_out)+'</div></div>'
